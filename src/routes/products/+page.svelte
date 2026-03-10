@@ -66,6 +66,16 @@
     dark: 'Dark',
     omni: 'Omni'
   };
+
+  let filterOpen = $state(false);
+
+  let activeFilterCount = $derived(
+    (filterSpecies !== 'all' ? 1 : 0) +
+    (filterCategory !== 'all' ? 1 : 0) +
+    (filterRoast !== 'all' ? 1 : 0) +
+    (filterPrice !== 'all' ? 1 : 0) +
+    (filterOrigin !== 'all' ? 1 : 0)
+  );
 </script>
 
 <svelte:head>
@@ -85,6 +95,25 @@
 <!-- filters -->
 <section class="filters-section">
   <div class="container">
+    <div class="filter-toggle-bar">
+      <button class="filter-toggle-btn" onclick={() => filterOpen = !filterOpen}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="6" x2="20" y2="6"/>
+          <line x1="8" y1="12" x2="20" y2="12"/>
+          <line x1="12" y1="18" x2="20" y2="18"/>
+        </svg>
+        {filterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+        {#if activeFilterCount > 0}
+          <span class="filter-badge">{activeFilterCount}</span>
+        {/if}
+        <svg class="toggle-chevron" class:open={filterOpen} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <p class="filter-count-inline">{filtered.length} produk</p>
+    </div>
+
+    {#if filterOpen}
     <div class="filters-row">
       <!-- Species -->
       <div class="filter-group">
@@ -145,10 +174,11 @@
 
     <div class="filter-meta">
       <p class="filter-count">{filtered.length} produk ditemukan</p>
-      {#if filterSpecies !== 'all' || filterCategory !== 'all' || filterRoast !== 'all' || filterPrice !== 'all' || filterOrigin !== 'all'}
+      {#if activeFilterCount > 0}
         <button class="reset-btn" onclick={resetFilters}>Reset Filter</button>
       {/if}
     </div>
+    {/if}
   </div>
 </section>
 
@@ -246,12 +276,66 @@
 
   /* filters */
   .filters-section {
-    padding: 36px 0;
+    padding: 16px 0;
     background: var(--cream);
     border-bottom: 1px solid var(--cream-dark);
     position: sticky;
     top: var(--nav-height);
     z-index: 50;
+  }
+
+  .filter-toggle-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+
+  .filter-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid var(--brown-200);
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    padding: 7px 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .filter-toggle-btn:hover {
+    border-color: var(--brown-400);
+    color: var(--brown-700);
+  }
+
+  .filter-badge {
+    background: var(--brown-600);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 10px;
+  }
+
+  .toggle-chevron {
+    transition: transform 0.25s ease;
+  }
+
+  .toggle-chevron.open {
+    transform: rotate(180deg);
+  }
+
+  .filter-count-inline {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .filters-row {
+    margin-top: 20px;
   }
 
   .filters-row {
